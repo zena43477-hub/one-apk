@@ -18,7 +18,13 @@ jobs:
           sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev automake
           pip install buildozer "cython<3" setuptools
       - name: Build
-        run: buildozer -v android debug
+        shell: bash
+        run: buildozer -v android debug 2>&1 | tee build.log
+      - name: Show error
+        if: failure()
+        run: |
+          n=$(grep -n "Command failed" build.log | head -1 | cut -d: -f1)
+          sed -n "$((n-60)),$((n))p" build.log
       - uses: actions/upload-artifact@v4
         with:
           name: apk
