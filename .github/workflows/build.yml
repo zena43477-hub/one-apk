@@ -1,31 +1,45 @@
 name: Build APK
 on: [push, workflow_dispatch]
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
+
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev automake libltdl-dev
+          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev
           pip install buildozer "cython<3" setuptools
+
       - name: Build
         shell: bash
         run: buildozer -v android debug 2>&1 | tee build.log
+
       - name: Show error
         if: failure()
-        run: |
-          n=$(grep -n "Command failed" build.log | head -1 | cut -d: -f1)
-          sed -n "$((n-60)),$((n))p" build.log
-      - uses: actions/upload-artifact@v4
+        run: tail -n 60 build.log
+
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+
+      - name: Upload APK
+        if: success()
+        uses: actions/upload-artifact@v4
         with:
           name: apk
           path: bin/*.apk
