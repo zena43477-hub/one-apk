@@ -3,7 +3,7 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -19,7 +19,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev
+          sudo apt-get install -y git zip unzip autoconf automake libtool libtool-bin libltdl-dev m4 gettext autopoint pkg-config zlib1g-dev libncurses-dev cmake libffi-dev libssl-dev
           pip install buildozer "cython<3" setuptools
 
       - name: Build
@@ -28,7 +28,7 @@ jobs:
 
       - name: Show error
         if: failure()
-        run: tail -n 60 build.log
+        run: grep -n -i -B2 -A8 "error:" build.log | tail -n 60
 
       - name: Upload log
         if: always()
