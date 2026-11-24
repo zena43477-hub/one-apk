@@ -5,7 +5,7 @@ package.domain = org.test
 source.dir = .
 source.include_exts = py,png,jpg
 version = 0.1
-requirements = python3==3.11.5,hostpython3==3.11.5,pygame,pgzero,numpy
+requirements = python3==3.10.12,hostpython3==3.10.12,pygame,pgzero,numpy
 orientation = portrait
 fullscreen = 1
 android.archs = arm64-v8a
