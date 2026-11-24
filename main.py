@@ -1,5 +1,40 @@
-import pgzrun
-from pygame import Rect
+import sys, os, traceback, textwrap
+
+def show_error(text):
+    try:
+        path = os.path.join(os.environ.get("ANDROID_PRIVATE", "."), "error.txt")
+        with open(path, "w") as f:
+            f.write(text)
+    except Exception:
+        pass
+    try:
+        import pygame
+        pygame.init()
+        screen = pygame.display.set_mode((480, 800))
+        font = pygame.font.Font(None, 26)
+        lines = []
+        for raw in text.splitlines():
+            lines += textwrap.wrap(raw, 38) or [""]
+        lines = lines[-28:]
+        clock = pygame.time.Clock()
+        while True:
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    return
+            screen.fill((60, 0, 0))
+            for i, line in enumerate(lines):
+                screen.blit(font.render(line, True, (255, 255, 255)), (8, 8 + i * 27))
+            pygame.display.flip()
+            clock.tick(15)
+    except Exception:
+        pass
+
+try:
+    import pgzrun
+    from pygame import Rect
+except Exception:
+    show_error(traceback.format_exc())
+    sys.exit()
 
 WIDTH = 480
 HEIGHT = 800
@@ -23,4 +58,7 @@ def on_mouse_down(pos):
     if button.collidepoint(pos):
         state["n"] += 1
 
-pgzrun.go()
+try:
+    pgzrun.go()
+except Exception:
+    show_error(traceback.format_exc())
