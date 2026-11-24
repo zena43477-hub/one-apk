@@ -29,6 +29,12 @@ def show_error(text):
     except Exception:
         pass
 
+import types
+try:
+    import numpy
+except ImportError:
+    sys.modules["numpy"] = types.ModuleType("numpy")
+
 try:
     import pgzrun
     from pygame import Rect
